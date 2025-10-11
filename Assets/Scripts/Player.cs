@@ -7,6 +7,8 @@ public class Player : MonoBehaviour
     float movementX;
     float movementY;
     [SerializeField] float speed = 6;
+    [SerializeField] float jumppower = 1;
+    bool jumping = false;
 
     private Rigidbody2D rb;
     // Start is called once before the first execution of Update after the MonoBehaviour is created
@@ -27,15 +29,48 @@ public class Player : MonoBehaviour
 
         movementX = v.x;
         movementY = v.y;
+    }
 
-        Debug.Log(v);
+    void OnJump()
+    {
+        if (touchingGround)
+        {
+            jumping = true;
+        }
     }
 
     void FixedUpdate()
     {
         float XmoveDistance = movementX * speed * Time.fixedDeltaTime;
-        float YmoveDistance = movementY * speed * Time.fixedDeltaTime;
-        rb.AddForce(new Vector2(XmoveDistance, YmoveDistance));
+        float YmoveDistance = movementY * Time.fixedDeltaTime;
+        rb.linearVelocityX = XmoveDistance;
+
+        // Handle Jumping
+        if (touchingGround)
+        {
+            rb.AddForce(YmoveDistance * jumppower * Vector2.up, ForceMode2D.Impulse);
+        }
         //transform.position = new Vector2(transform.position.x + XmoveDistance, transform.position.y + YmoveDistance);
+    }
+
+    bool touchingGround;
+
+    private void OnCollisionEnter2D(Collision2D collision)
+    {
+        Debug.Log(collision.gameObject);
+        if (collision.gameObject.CompareTag("ground"))
+        {
+            touchingGround = true;
+            jumping = false;
+        }
+    }
+
+    private void OnCollisionExit2D(Collision2D collision)
+    {
+        Debug.Log(collision.gameObject);
+        if (collision.gameObject.CompareTag("ground"))
+        {
+            touchingGround = false;
+        }
     }
 }
