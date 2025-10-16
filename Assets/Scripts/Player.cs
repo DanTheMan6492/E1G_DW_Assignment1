@@ -14,8 +14,7 @@ public class Player : MonoBehaviour
     private Rigidbody2D rb;
     private Animator animator;
     private SpriteRenderer spriteRenderer;
-    
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
+    private int coinScore = 0;    // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
@@ -54,7 +53,6 @@ public class Player : MonoBehaviour
         // Floor is beneath feet
         touchingGround = hit.collider != null;
 
-        Debug.Log(hit.collider);
 
         // Handle Jumping
         if (jumping)
@@ -63,5 +61,11 @@ public class Player : MonoBehaviour
             jumping = false;
         }
         //transform.position = new Vector2(transform.position.x + XmoveDistance, transform.position.y + YmoveDistance);
+    }
+
+    public void AddCoin(int value)
+    {
+        coinScore += value;
+        Debug.Log(value);
     }
 }
