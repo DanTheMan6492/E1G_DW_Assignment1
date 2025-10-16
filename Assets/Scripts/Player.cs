@@ -5,72 +5,50 @@ using UnityEngine.InputSystem;
 public class Player : MonoBehaviour
 {
     float movementX;
-    float movementY;
     [SerializeField] float speed = 6;
     [SerializeField] float jumppower = 1;
     bool jumping = false;
-
+    bool touchingGround;
+    [SerializeField] float rayCastDist = 6;
+    int layerMask = 0b111001;
     private Rigidbody2D rb;
+    
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
     }
 
-    // Update is called once per frame
-    void Update()
-    {
-
-    }
-
     void OnMove(InputValue value)
     {
         Vector2 v = value.Get<Vector2>();
-
         movementX = v.x;
-        movementY = v.y;
     }
 
     void OnJump()
     {
-        if (touchingGround)
-        {
-            jumping = true;
-        }
+        jumping = touchingGround;
     }
 
     void FixedUpdate()
     {
+
         float XmoveDistance = movementX * speed * Time.fixedDeltaTime;
-        float YmoveDistance = movementY * Time.fixedDeltaTime;
         rb.linearVelocityX = XmoveDistance;
 
+        RaycastHit2D hit = Physics2D.Raycast(transform.position, Vector2.down, rayCastDist, layerMask);
+
+        // Floor is beneath feet
+        touchingGround = hit.collider != null;
+
+        Debug.Log(hit.collider);
+
         // Handle Jumping
-        if (touchingGround)
+        if (jumping)
         {
-            rb.AddForce(YmoveDistance * jumppower * Vector2.up, ForceMode2D.Impulse);
-        }
-        //transform.position = new Vector2(transform.position.x + XmoveDistance, transform.position.y + YmoveDistance);
-    }
-
-    bool touchingGround;
-
-    private void OnCollisionEnter2D(Collision2D collision)
-    {
-        Debug.Log(collision.gameObject);
-        if (collision.gameObject.CompareTag("ground"))
-        {
-            touchingGround = true;
+            rb.AddForce(Time.fixedDeltaTime * jumppower * Vector2.up, ForceMode2D.Impulse);
             jumping = false;
         }
-    }
-
-    private void OnCollisionExit2D(Collision2D collision)
-    {
-        Debug.Log(collision.gameObject);
-        if (collision.gameObject.CompareTag("ground"))
-        {
-            touchingGround = false;
-        }
+        //transform.position = new Vector2(transform.position.x + XmoveDistance, transform.position.y + YmoveDistance);
     }
 }
