@@ -12,11 +12,24 @@ public class Player : MonoBehaviour
     [SerializeField] float rayCastDist = 6;
     int layerMask = 0b111001;
     private Rigidbody2D rb;
+    private Animator animator;
+    private SpriteRenderer spriteRenderer;
     
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
+        animator = GetComponent<Animator>();
+        spriteRenderer = GetComponent<SpriteRenderer>();
+    }
+
+    void Update()
+    {
+        animator.SetBool("Walking", movementX != 0f);
+        if (movementX != 0f)
+        {
+            spriteRenderer.flipX = rb.linearVelocityX < 0f;
+        }
     }
 
     void OnMove(InputValue value)
